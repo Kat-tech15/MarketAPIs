@@ -1,11 +1,13 @@
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
+from drf_spectacular.utils import extend_schema 
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
 from .serializers import UserSerializer, LoginSerializer, EmptySerializer, MessageSerializer
 from .models import CustomUser, Message
 
+@extend_schema(tags=['Accounts'])
 class RegisterView(generics.GenericAPIView):
     serializer_class =  UserSerializer
 
@@ -16,7 +18,7 @@ class RegisterView(generics.GenericAPIView):
             return Response({'message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
+@extend_schema(tags=['Accounts'])
 class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
 
@@ -37,6 +39,7 @@ class LoginView(generics.GenericAPIView):
             })
         return Response({'message': 'Invalid credentials'}, status=status.HTTP_200_OK)
 
+@extend_schema(tags=['Accounts'])
 class LogoutView(generics.GenericAPIView):
     serializer_class = EmptySerializer
     permission_class =  [permissions.IsAuthenticated]

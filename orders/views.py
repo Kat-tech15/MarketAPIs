@@ -1,8 +1,10 @@
 from rest_framework import mixins, permissions, generics, status
+from drf_spectacular.utils import extend_schema
 from rest_framework.response import Response
 from .serializers import OrderSerializer
 from .models import Order
 
+@extend_schema(tags=['Orders'])
 class OrderCreateView(mixins.CreateModelMixin, mixins.ListModelMixin, generics.GenericAPIView):
     serializer_class =  OrderSerializer
     queryset = Order.objects.all()
@@ -15,7 +17,7 @@ class OrderCreateView(mixins.CreateModelMixin, mixins.ListModelMixin, generics.G
         self.list(request, *args, **kwargs)
         return Response(status=status.HTTP_200_OK)
 
-
+@extend_schema(tags=['Orders'])
 class OrderDetailView(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,

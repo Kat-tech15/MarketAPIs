@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'rest_framework',
-    'drf_yasg',
+    'drf_spectacular',
     'accounts',
     'products',
     'orders',
@@ -136,4 +136,10 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Market APIs',
+    'VERSION': '1.0',
+    'SCHEMA_PATH_PREFIX': r'api/',
 }
