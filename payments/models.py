@@ -12,7 +12,7 @@ class Payment(models.Model):
         ('cancelled', 'Cancelled'),
         ('approved', 'Approved')
     )
-    order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name='payment')
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='payment')
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     amount = models.DecimalField(max_digits=8, decimal_places=2)
     gateway = models.CharField(max_length=10, choices=GATEWAY_CHOICES, default='stripe')

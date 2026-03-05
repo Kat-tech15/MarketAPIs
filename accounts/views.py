@@ -4,7 +4,7 @@ from drf_spectacular.utils import extend_schema
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
-from .serializers import UserSerializer, LoginSerializer, EmptySerializer, MessageSerializer
+from .serializers import UserSerializer, LoginSerializer, EmptySerializer, MessageSerializer, ResendOTPSerializer, VerifyOTPSerializer
 from .models import CustomUser, Message
 
 @extend_schema(tags=['Accounts'])
@@ -15,6 +15,12 @@ class RegisterView(generics.GenericAPIView):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
+
+            otp_via = getattr(user, 'otp_via', 'email').lower()
+            send_via_sms = otp_via == 'sms'
+
+            send_otp_to_user(user, via_sms=send_via_sms)
+
             return Response({'message': 'User registered successfully.'}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -31,6 +37,10 @@ class LoginView(generics.GenericAPIView):
 
         user = authenticate(username=username, password=password)
         if user:
+            if not user.is_verified:
+                return Response({'message': f'Email not verified. Please verify your email to login.'}, status=status.HTTP_403_FORBIDDEN)
+            
+
             refresh = RefreshToken.for_user(user=user)
             return Response({
                 'access': str(refresh.access_token),
@@ -50,3 +60,8 @@ class LogoutView(generics.GenericAPIView):
 
         return Response({'message': 'User deleted successfully!'}, status=status.HTTP_200_OK)
         
+@extend_schema(tags=['Accounts'])
+class ContactView(generics.ListCreateAPIView):
+    queryset = Message.objects.all()
+    serializer_class = MessageSerializer
+    permission_classes = [permissions.IsAuthenticated]
